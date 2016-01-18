@@ -1,0 +1,30 @@
+body {
+    padding: 0px;
+    margin: 0px;
+}
+.main-broadcaster {
+    position: absolute;
+    background-color: black;
+    min-width: 100%;
+    min-height: 100%;
+}
+.broadcaster-bar {
+    position: absolute;
+    background-color: rgba(26, 26, 26, 0.75);
+    text-align: center;
+    min-width: 100%;
+    min-height: 200px;
+    bottom: 0;
+}
+.broadcaster {
+    display: inline-block;
+    background-color: lightgray;
+    width: 320px;
+    height: 180px;
+    margin: 10px;
+}
+
+#localVideo {
+    position: absolute;
+    height: 100%;
+}

@@ -93,8 +93,8 @@ socket.on('message', function (message){
 
 ////////////////////////////////////////////////////
 
-var localVideo = document.querySelector('#localVideo');
-var remoteVideo = document.querySelector('#remoteVideo');
+var localVideo = document.querySelector('#remoteVideo0');
+var remoteVideo = document.querySelector('#remoteVideo1');
 
 function handleUserMedia(stream) {
   console.log('Adding local stream.');
