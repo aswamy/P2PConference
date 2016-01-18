@@ -9,19 +9,21 @@ body {
     min-height: 100%;
 }
 .broadcaster-bar {
+    display: flex;
+    justify-content: center;
     position: absolute;
     background-color: rgba(26, 26, 26, 0.75);
     text-align: center;
     min-width: 100%;
-    min-height: 200px;
     bottom: 0;
 }
 .broadcaster {
     display: inline-block;
+    align-self: center;
     background-color: lightgray;
-    width: 320px;
-    height: 180px;
-    margin: 10px;
+    width: 20%;
+    height: 13%;
+    margin: 1%;
 }
 
 #localVideo {
