@@ -12,20 +12,22 @@
 </head>
 
 <body>
-    <video class='main-broadcaster' id='remoteVideo0' autoplay muted></video>
+    <video class='main-broadcaster' id='remoteVideo0' src='#' autoplay muted></video>
     <div class='broadcaster-bar'>
-        <video id='remoteVideo1' class='broadcaster'>
+        <video id='remoteVideo1' src='#' class='broadcaster'>
         </video>
-        <video id='remoteVideo2' class='broadcaster'>
+        <video id='remoteVideo2' src='#' class='broadcaster'>
         </video>
-        <video id='remoteVideo3' class='broadcaster'>
+        <video id='remoteVideo3' src='#' class='broadcaster'>
         </video>
-        <video id='remoteVideo4' class='broadcaster'>
+        <video id='remoteVideo4' src='#' class='broadcaster'>
         </video>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src='/socket.io/socket.io.js'></script>
     <script src='js/lib/adapter.js'></script>
     <script src='js/main.js'></script>
+    <script src='js/video-switcher.js'></script>
 </body>
 </html>
