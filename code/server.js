@@ -14,7 +14,7 @@ var app = http.createServer(options, function (req, res) {
   file.serve(req, res);
 }).listen(8888);
 
-var io = socketio.listen(app);
+var io = socketio.listen(app, {log: false});
 
 io.sockets.on('connection', function (socket) {
 	function log(){
@@ -26,6 +26,7 @@ io.sockets.on('connection', function (socket) {
 	}
 
 	socket.on('message', function (message) {
+		console.log(message);
 		log('Got message: ', message);
     // For a real app, should be room only (not broadcast)
 		socket.broadcast.emit('message', message);
@@ -40,15 +41,24 @@ io.sockets.on('connection', function (socket) {
 		if (numClients == 0){
 			socket.join(room);
 			socket.emit('created', room);
-		} else if (numClients == 1) {
+		} else {
+			io.sockets.in(room).emit('join', room);
+			socket.join(room);
+			socket.emit('joined', room);
+		}
+
+
+		/*
+		else if (numClients == 1) {
 			io.sockets.in(room).emit('join', room);
 			socket.join(room);
 			socket.emit('joined', room);
 		} else { // max two clients
 			socket.emit('full', room);
 		}
-		socket.emit('emit(): client ' + socket.id + ' joined room ' + room);
-		socket.broadcast.emit('broadcast(): client ' + socket.id + ' joined room ' + room);
+		*/
+		//socket.emit('emit(): client ' + socket.id + ' joined room ' + room);
+		//socket.broadcast.emit('broadcast(): client ' + socket.id + ' joined room ' + room);
 	});
 });
 
