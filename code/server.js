@@ -6,9 +6,14 @@ var options = {
 	cert: fs.readFileSync('../fake-keys/certificate.pem')
 };
 
+var proxy = require('http').createServer(function (req, res) {
+	res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+	res.end();
+}).listen(80);
+
 var app = require('https').createServer(options, function (req, res) {
 	file.serve(req, res);
-}).listen(8888);
+}).listen(443);
 
 var io = require('socket.io')(app);
 
