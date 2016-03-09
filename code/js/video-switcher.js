@@ -1,5 +1,6 @@
 $('.broadcaster').click(function() {
+    console.log('clicky');
     var temp = this.src;
-    this.src = $('#remoteVideo0')[0].src;
-    $('#remoteVideo0')[0].src = temp;
+    this.src = $('#mainvideo')[0].src;
+    $('#mainvideo')[0].src = temp;
 });
