@@ -110,6 +110,10 @@ function createPeerConnection(id) {
     pc.addStream(localstream);
     pc.onicecandidate = onAddIceCandidateHandler(id);
     pc.onaddstream = onAddStreamHandler(id);
+    pc.oniceconnectionstatechange = function() {
+        if(pc.iceConnectionState == 'disconnected')
+            document.getElementById(id).remove();
+    };
 
     return pc;
 }
