@@ -90,7 +90,7 @@ function gotStream(stream) {
 
 function start() {
     navigator.mediaDevices.getUserMedia({
-            audio: true,
+            audio: false,
             video: true
         })
         .then(gotStream)
