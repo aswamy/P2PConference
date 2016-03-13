@@ -2,6 +2,7 @@ body {
     padding: 0px;
     margin: 0px;
     display: flex;
+    overflow: hidden;
 }
 .column {
     display: inline-block;
@@ -38,12 +39,56 @@ body {
     height: 13%;
     margin: 1%;
 }
-.chatdisplay {
+#chatdisplay {
     background-color: rgb(225,225,225);
+    border-style: solid;
+    border-color: gray;
+    border-width: 0px;
+    border-left-width: 1px;
     width: 100%;
     height: calc(100% - 150px);
+    overflow-y: scroll;
+    font-size: 14px;
+    font-family: monospace;
 }
-.chatinput {
+#chatdisplay > div {
+    margin: 5px;
+}
+#chatinput {
     width: 100%;
     height: 150px;
+    display: flex;
+}
+#chatinput > div {
+    display: inline-block;
+    height: 100%;
+    width: 20%;
+}
+#chatinput > div:first-child {
+    width: 80%;
+}
+#chatinput textarea {
+    resize: none;
+    height: 100%;
+    width: 100%;
+}
+#sendbtn, #attachbtn {
+    vertical-align: middle;
+    text-align: center;
+    height: 50%;
+    line-height: 75px;
+    cursor: pointer;
+    width: 100%;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#sendbtn {
+    background-color: forestgreen;
+}
+#attachbtn {
+    background-color: darkorange;
 }

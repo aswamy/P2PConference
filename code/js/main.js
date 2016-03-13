@@ -5,6 +5,7 @@ var localstream = null;
 var peerconnections = {};
 var datachannels = {};
 
+var myId = '';
 /*
  -----------------------------
  Messages via signaling server
@@ -13,6 +14,7 @@ var datachannels = {};
 
 socket.on('clientid', function(data) {
     console.log("I am client " + data.id);
+    myId = data.id;
 
     start();
 
@@ -26,7 +28,9 @@ socket.on('newguy', function(data) {
     var pc = createPeerConnection(id);
 
     datachannels[id] = pc.createDataChannel('sendDataChannel', null);
-    datachannels[id].onopen = datachannels[id].onclose = function() { datachannels[id].send('BLASDFHZXCKVLNZDV') };
+    setupDatachannel(datachannels[id], id);
+
+    pc.ondatachannel = onDataChannelHandler(id);
 
     pc.createOffer(function(offer) {
         pc.setLocalDescription(new RTCSessionDescription(offer), function() {
@@ -91,9 +95,30 @@ function onAddIceCandidateHandler(id) {
 function onDataChannelHandler(id) {
     return function(e) {
         datachannels[id] = e.channel;
-        datachannels[id].onopen = datachannels[id].onclose = function() { console.log('data channel '+id+' state change') };
-        datachannels[id].onmessage = function(e) { console.log("datachannel message", e.data); };
+        datachannels[id].onopen = function() { console.log('data channel '+id+' state change') };
+        datachannels[id].onclose = function() {
+            delete datachannels[id];
+            console.log("Removed " + id + " from datachannel list");
+        };
+        datachannels[id].onmessage = function(e) {
+            displayClientMessage(id, e.data);
+        };
     };
+}
+
+function setupDatachannel(channel, id) {
+    channel.onopen = function() { console.log('data channel '+id+' state change') };
+    channel.onclose = function() {
+        delete datachannels[id];
+        console.log("Removed " + id + " from datachannel list");
+    };
+    channel.onmessage = function(e) {
+        displayClientMessage(id, e.data);
+    };
+}
+
+function displayClientMessage(id, val) {
+    $("#chatdisplay").append("<div><div><strong>" + id + ": </strong></div>" + val + "</div>");
 }
 
 function gotStream(stream) {
@@ -131,3 +156,14 @@ function createPeerConnection(id) {
 
     return pc;
 }
+
+document.getElementById("sendbtn").onclick = function() {
+    var textbox = $("#chatinput textarea");
+
+    $.each(datachannels, function(channelId, channel) {
+        channel.send(textbox.val());
+    });
+
+    displayClientMessage(myId, textbox.val());
+    textbox.val('');
+};
