@@ -2,7 +2,18 @@ body {
     padding: 0px;
     margin: 0px;
 }
-.main-broadcaster {
+.column {
+    display: inline-block;
+    position: relative;
+    height: 100%;
+}
+.rightcolumn {
+    width: 300px;
+}
+.leftcolumn {
+    width: calc(100% - 300px);
+}
+#main-broadcaster video {
     position: absolute;
     background-color: black;
     min-width: 100%;
@@ -19,16 +30,10 @@ body {
     min-width: 100%;
     bottom: 0;
 }
-.broadcaster {
+.broadcaster-bar video {
     display: inline-block;
     align-self: center;
-    background-color: lightgray;
-    width: 20%;
+    background-color: dimgray;
     height: 13%;
     margin: 1%;
-}
-
-#localVideo {
-    position: absolute;
-    height: 100%;
 }

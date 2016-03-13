@@ -72,6 +72,7 @@ function onAddStreamHandler(id) {
         var newVid = $("<video id='" +id+ "' class='broadcaster'></video>");
         $("#casters").append( newVid );
         document.getElementById(id).srcObject = event.stream;
+        document.getElementById(id).onclick = videoSwitcher;
     };
 }
 
