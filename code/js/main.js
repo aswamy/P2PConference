@@ -3,7 +3,7 @@ var localvideo = document.querySelector('video#mainvideo');
 var localstream = null;
 
 var peerconnections = {};
-
+var datachannels = {};
 
 /*
  -----------------------------
@@ -25,6 +25,9 @@ socket.on('newguy', function(data) {
 
     var pc = createPeerConnection(id);
 
+    datachannels[id] = pc.createDataChannel('sendDataChannel', null);
+    datachannels[id].onopen = datachannels[id].onclose = function() { datachannels[id].send('BLASDFHZXCKVLNZDV') };
+
     pc.createOffer(function(offer) {
         pc.setLocalDescription(new RTCSessionDescription(offer), function() {
             console.log('Sending client ' + id + ' a call offer');
@@ -38,6 +41,8 @@ socket.on('peerconnsetuprequest', function(data) {
     console.log("Receving a call offer from " + id);
 
     var pc = createPeerConnection(id);
+
+    pc.ondatachannel = onDataChannelHandler(id);
 
     pc.setRemoteDescription(new RTCSessionDescription(data.data), function() {
         pc.createAnswer(function(answer) {
@@ -80,6 +85,14 @@ function onAddIceCandidateHandler(id) {
     return function(event) {
         if(event.candidate)
             socket.emit('icecandidate', { id: id, data: event.candidate});
+    };
+}
+
+function onDataChannelHandler(id) {
+    return function(e) {
+        datachannels[id] = e.channel;
+        datachannels[id].onopen = datachannels[id].onclose = function() { console.log('data channel '+id+' state change') };
+        datachannels[id].onmessage = function(e) { console.log("datachannel message", e.data); };
     };
 }
 
