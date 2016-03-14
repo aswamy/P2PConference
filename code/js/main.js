@@ -7,6 +7,18 @@ var datachannels = {};
 
 var idNameMap = {};
 var myId = '';
+
+var idFileBufferMap = {};   // Each client gets their own file buffer for receiving files
+
+
+/*
+ -----------------------------
+ Static Variables
+ -----------------------------
+ */
+
+var FILE_CHUNK_SIZE = 512*32;
+
 /*
  -----------------------------
  Messages via signaling server
@@ -103,14 +115,7 @@ function onAddIceCandidateHandler(id) {
 function onDataChannelHandler(id) {
     return function(e) {
         datachannels[id] = e.channel;
-        datachannels[id].onopen = function() { console.log('data channel '+id+' state change') };
-        datachannels[id].onclose = function() {
-            delete datachannels[id];
-            console.log("Removed " + id + " from datachannel list");
-        };
-        datachannels[id].onmessage = function(e) {
-            displayClientMessage(id, e.data);
-        };
+        setupDatachannel(datachannels[id], id);
     };
 }
 
@@ -121,13 +126,52 @@ function setupDatachannel(channel, id) {
         console.log("Removed " + id + " from datachannel list");
     };
     channel.onmessage = function(e) {
-        displayClientMessage(id, e.data);
+        decodeClientMessage(id, e.data);
     };
     channel.binaryType = 'arraybuffer';
+    idFileBufferMap[id] = new FileMetadata();
+    idFileBufferMap[id].buffer = [];
+    idFileBufferMap[id].received = 0;
 }
 
-function displayClientMessage(id, val) {
-    $("#chatdisplay").append("<div><div><strong>" + idNameMap[id] + ": </strong></div>" + val + "</div>");
+function decodeClientMessage(id, val) {
+    if (val instanceof ArrayBuffer) {
+        readFileChunk(idFileBufferMap[id], val);
+    } else {
+        try {
+            readFileMetaData(id, JSON.parse(val));
+        } catch(e) {
+            displayNotification(idNameMap[id], val);
+        }
+    }
+}
+
+function displayNotification(from, data, color) {
+    var newdiv = $("<div><div><strong>" + from + ": </strong></div>" + data + "</div>");
+    if(color) newdiv.css("color", color);
+    $("#chatdisplay").append(newdiv);
+}
+
+function readFileMetaData(id, metadata) {
+    console.log("Got file metadata for " + metadata.name);
+    idFileBufferMap[id].name = metadata.name;
+    idFileBufferMap[id].size = metadata.size;
+}
+
+function readFileChunk(fileData, data) {
+    fileData.buffer.push(data);
+    fileData.received += data.byteLength;
+
+    if(fileData.received == fileData.size) {
+        var receivedFile = new window.Blob(fileData.buffer);
+
+        displayNotification("Download", "<a href='" + URL.createObjectURL(receivedFile) + "' download='" + fileData.name + "'>" + fileData.name + "</a>" , "forestgreen");
+
+        fileData.name = '';
+        fileData.size = 0;
+        fileData.received = 0;
+        fileData.buffer = [];
+    }
 }
 
 function gotStream(stream) {
@@ -166,6 +210,25 @@ function createPeerConnection(id) {
     return pc;
 }
 
+
+/*
+ -----------------------------
+ Classes
+ -----------------------------
+ */
+
+function FileMetadata() {
+    this.name = '';
+    this.size = 0;
+}
+
+
+/*
+ -----------------------------
+ HTML Button functions
+ -----------------------------
+ */
+
 document.getElementById("sendbtn").onclick = function() {
     var textbox = $("#chatinput textarea");
 
@@ -173,6 +236,34 @@ document.getElementById("sendbtn").onclick = function() {
         channel.send(textbox.val());
     });
 
-    displayClientMessage(myId, textbox.val());
+    decodeClientMessage(myId, textbox.val());
     textbox.val('');
+};
+
+document.getElementById("attachfile").onchange = function() {
+    var file = this.files[0];
+
+    if(file != undefined) {
+        $.each(datachannels, function(channelId, channel) {
+            var metadata = new FileMetadata();
+            metadata.name = file.name;
+            metadata.size = file.size;
+            channel.send(JSON.stringify(metadata));
+
+            var sliceFile = function(offset) {
+                var reader = new window.FileReader();
+                reader.onload = (function() {
+                    return function(e) {
+                        channel.send(e.target.result);
+                        if (file.size > offset + e.target.result.byteLength)
+                            window.setTimeout(sliceFile, 0, offset + FILE_CHUNK_SIZE); // To send each slice in parallel
+                    };
+                })(file);
+                var slice = file.slice(offset, offset + FILE_CHUNK_SIZE);
+                reader.readAsArrayBuffer(slice);
+            };
+            sliceFile(0);
+        });
+        displayNotification("Notification", "File " + file.name + " has been uploaded.", "gray");
+    }
 };
