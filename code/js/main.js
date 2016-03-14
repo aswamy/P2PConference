@@ -5,6 +5,7 @@ var localstream = null;
 var peerconnections = {};
 var datachannels = {};
 
+var idNameMap = {};
 var myId = '';
 /*
  -----------------------------
@@ -14,7 +15,11 @@ var myId = '';
 
 socket.on('clientid', function(data) {
     console.log("I am client " + data.id);
+
     myId = data.id;
+    data.name = 'Anonymous';
+
+    idNameMap[myId] = 'Me';
 
     start();
 
@@ -23,9 +28,11 @@ socket.on('clientid', function(data) {
 
 socket.on('newguy', function(data) {
     var id = data.id;
+
     console.info("New guy:", id);
 
     var pc = createPeerConnection(id);
+    idNameMap[id] = data.name;
 
     datachannels[id] = pc.createDataChannel('sendDataChannel', null);
     setupDatachannel(datachannels[id], id);
@@ -35,7 +42,7 @@ socket.on('newguy', function(data) {
     pc.createOffer(function(offer) {
         pc.setLocalDescription(new RTCSessionDescription(offer), function() {
             console.log('Sending client ' + id + ' a call offer');
-            socket.emit('peerconnsetuprequest', {id: id, data: offer});
+            socket.emit('peerconnsetuprequest', {id: id, name: data.name, data: offer});
         }, null);
     }, null);
 });
@@ -45,6 +52,7 @@ socket.on('peerconnsetuprequest', function(data) {
     console.log("Receving a call offer from " + id);
 
     var pc = createPeerConnection(id);
+    idNameMap[id] = data.name;
 
     pc.ondatachannel = onDataChannelHandler(id);
 
@@ -115,10 +123,11 @@ function setupDatachannel(channel, id) {
     channel.onmessage = function(e) {
         displayClientMessage(id, e.data);
     };
+    channel.binaryType = 'arraybuffer';
 }
 
 function displayClientMessage(id, val) {
-    $("#chatdisplay").append("<div><div><strong>" + id + ": </strong></div>" + val + "</div>");
+    $("#chatdisplay").append("<div><div><strong>" + idNameMap[id] + ": </strong></div>" + val + "</div>");
 }
 
 function gotStream(stream) {

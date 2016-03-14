@@ -29,9 +29,9 @@ io.on('connection', function (socket) {
 		console.log("Got a setup request from " + socket.id + " to " + message.id);
 
 		io.sockets.connected[message.id]
-				.emit('peerconnsetuprequest',
-						{ id: socket.id, data: message.data }
-				);
+			.emit('peerconnsetuprequest',
+				{ id: socket.id, data: message.data, name: message.name }
+			);
 	});
 
 	socket.on('peerconnsetupanswer', function(message) {
