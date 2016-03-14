@@ -18,6 +18,9 @@ var idFileBufferMap = {};   // Each client gets their own file buffer for receiv
  */
 
 var FILE_CHUNK_SIZE = 512*32;
+var NOTIF = "Notification";
+var DOWNLOAD = "Download";
+
 
 /*
  -----------------------------
@@ -35,7 +38,7 @@ socket.on('clientid', function(data) {
 
     start();
 
-    socket.emit('hello', data);
+    socket.emit('join', data);
 });
 
 socket.on('newguy', function(data) {
@@ -154,6 +157,7 @@ function displayNotification(from, data, color) {
 
 function readFileMetaData(id, metadata) {
     console.log("Got file metadata for " + metadata.name);
+    displayNotification(NOTIF, "Receiving file " + metadata.name, "gray");
     idFileBufferMap[id].name = metadata.name;
     idFileBufferMap[id].size = metadata.size;
 }
@@ -165,7 +169,7 @@ function readFileChunk(fileData, data) {
     if(fileData.received == fileData.size) {
         var receivedFile = new window.Blob(fileData.buffer);
 
-        displayNotification("Download", "<a href='" + URL.createObjectURL(receivedFile) + "' download='" + fileData.name + "'>" + fileData.name + "</a>" , "forestgreen");
+        displayNotification(DOWNLOAD, "<a href='" + URL.createObjectURL(receivedFile) + "' download='" + fileData.name + "'>" + fileData.name + "</a>" , "forestgreen");
 
         fileData.name = '';
         fileData.size = 0;
@@ -244,6 +248,7 @@ document.getElementById("attachfile").onchange = function() {
     var file = this.files[0];
 
     if(file != undefined) {
+        document.getElementById("attachfile").disabled = true;
         $.each(datachannels, function(channelId, channel) {
             var metadata = new FileMetadata();
             metadata.name = file.name;
@@ -264,6 +269,7 @@ document.getElementById("attachfile").onchange = function() {
             };
             sliceFile(0);
         });
-        displayNotification("Notification", "File " + file.name + " has been uploaded.", "gray");
+        displayNotification(NOTIF, "File " + file.name + " has been uploaded.", "gray");
+        document.getElementById("attachfile").disabled = false;
     }
 };

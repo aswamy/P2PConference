@@ -19,7 +19,7 @@ var io = require('socket.io')(app);
 
 io.on('connection', function (socket) {
 
-	socket.on('hello', function(message) {
+	socket.on('join', function(message) {
 		// Tell everyone in the room "hello!"
 		io.to('alokroom').emit('newguy', message);
 		socket.join('alokroom');
