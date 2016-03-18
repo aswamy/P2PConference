@@ -21,8 +21,8 @@ io.on('connection', function (socket) {
 
 	socket.on('join', function(message) {
 		// Tell everyone in the room "hello!"
-		io.to('alokroom').emit('newguy', message);
-		socket.join('alokroom');
+		io.to(message.room).emit('newguy', message);
+		socket.join(message.room);
 	});
 
 	socket.on('peerconnsetuprequest', function(message) {

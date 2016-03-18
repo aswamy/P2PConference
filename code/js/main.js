@@ -1,4 +1,3 @@
-var socket = io.connect();
 var localvideo = document.querySelector('video#mainvideo');
 var localstream = null;
 
@@ -7,6 +6,8 @@ var datachannels = {};
 
 var idNameMap = {};
 var myId = '';
+var name = '';
+var room = '';
 
 var idFileBufferMap = {};   // Each client gets their own file buffer for receiving files
 
@@ -24,15 +25,30 @@ var DOWNLOAD = "Download";
 
 /*
  -----------------------------
+ Prompts for data (temp only)
+ -----------------------------
+ */
+
+name = prompt("What's your name?").trim() || '';
+room = prompt("What room do you want to join?").trim() || "default_room";
+
+$('#room-name').append(room);
+
+
+/*
+ -----------------------------
  Messages via signaling server
  -----------------------------
  */
+
+var socket = io.connect();
 
 socket.on('clientid', function(data) {
     console.log("I am client " + data.id);
 
     myId = data.id;
-    data.name = 'Anonymous';
+    data.name = name.trim() || "Anonymous";
+    data.room = room;
 
     idNameMap[myId] = 'Me';
 
@@ -57,7 +73,7 @@ socket.on('newguy', function(data) {
     pc.createOffer(function(offer) {
         pc.setLocalDescription(new RTCSessionDescription(offer), function() {
             console.log('Sending client ' + id + ' a call offer');
-            socket.emit('peerconnsetuprequest', {id: id, name: data.name, data: offer});
+            socket.emit('peerconnsetuprequest', {id: id, name: name, data: offer});
         }, null);
     }, null);
 });
