@@ -60,6 +60,7 @@ body {
     overflow-y: scroll;
     font-size: 14px;
     font-family: monospace;
+    word-wrap: break-word;
 }
 #chatdisplay > div {
     margin: 5px;

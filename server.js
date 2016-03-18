@@ -1,19 +1,24 @@
 var fs = require('fs');
-var file = new(require('node-static').Server)();
+
+var express = require('express');
+var express_inst = express();
+
+express_inst.use('/', express.static('public'));
+express_inst.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
+express_inst.use('/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
+express_inst.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
 
 var options = {
-	key: fs.readFileSync('../fake-keys/privatekey.pem'),
-	cert: fs.readFileSync('../fake-keys/certificate.pem')
+	key: fs.readFileSync('fake-keys/privatekey.pem'),
+	cert: fs.readFileSync('fake-keys/certificate.pem')
 };
+
+var app = require('https').createServer(options, express_inst).listen(443);
 
 var proxy = require('http').createServer(function (req, res) {
 	res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
 	res.end();
 }).listen(80);
-
-var app = require('https').createServer(options, function (req, res) {
-	file.serve(req, res);
-}).listen(443);
 
 var io = require('socket.io')(app);
 

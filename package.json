@@ -17,9 +17,10 @@
   "author": "alok swamy",
   "license": "MIT",
   "dependencies": {
-    "node-static": "~0.7.7",
-    "socket.io": "~1.4.5",
+    "bootstrap": "^3.3.6",
     "express": "~3.4.0",
-    "fs": "~0.0.2"
+    "fs": "~0.0.2",
+    "jquery": "^2.2.2",
+    "socket.io": "~1.4.5"
   }
 }
