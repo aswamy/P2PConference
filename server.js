@@ -1,5 +1,3 @@
-var fs = require('fs');
-
 var express = require('express');
 var express_inst = express();
 
@@ -8,12 +6,14 @@ express_inst.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist
 express_inst.use('/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
 express_inst.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
 
-var options = {
-	key: fs.readFileSync('fake-keys/privatekey.pem'),
-	cert: fs.readFileSync('fake-keys/certificate.pem')
-};
+var fs = require('fs');
 
-var app = require('https').createServer(options, express_inst).listen(443);
+var app = require('https')
+		.createServer({
+			key: fs.readFileSync('fake-keys/privatekey.pem'),
+			cert: fs.readFileSync('fake-keys/certificate.pem')
+		}, express_inst)
+		.listen(443);
 
 var proxy = require('http').createServer(function (req, res) {
 	res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
@@ -22,10 +22,14 @@ var proxy = require('http').createServer(function (req, res) {
 
 var io = require('socket.io')(app);
 
+var openRooms = {};
+
+
 io.on('connection', function (socket) {
 
 	socket.on('join', function(message) {
 		// Tell everyone in the room "hello!"
+		socket.peer_name = message.name;
 		io.to(message.room).emit('newguy', message);
 		socket.join(message.room);
 	});
@@ -55,6 +59,10 @@ io.on('connection', function (socket) {
 				.emit('icecandidate',
 						{ id: socket.id, data: message.data }
 				);
+	});
+
+	socket.on('disconnect', function() {
+		console.log("Client: " + " - " + socket.peer_name + " has disconnected");
 	});
 
 	socket.emit('clientid', { id: socket.id });
