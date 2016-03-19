@@ -13,6 +13,10 @@ function send() {
 }
 
 $('#chatinput textarea').on('keydown', function(event) {
-    if (event.keyCode == 13)
-        if (!event.shiftKey) send();
+    if (event.keyCode == 13) {
+        if (!event.shiftKey) {
+            send();
+            return false;
+        }
+    }
 });

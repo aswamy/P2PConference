@@ -8,6 +8,7 @@ var idNameMap = {};
 var myId = '';
 var name = '';
 var room = '';
+var pwd = '';
 
 var idFileBufferMap = {};   // Each client gets their own file buffer for receiving files
 
@@ -29,10 +30,16 @@ var DOWNLOAD = "Download";
  -----------------------------
  */
 
-name = prompt("What's your name?").trim() || '';
-room = prompt("What room do you want to join?").trim() || "default_room";
+name = prompt("What's your name?") || '';
+name = name.trim();
+
+room = prompt("What room do you want to join?") || '';
+room = room.trim();
+if(room == '') room = "default_room";
 
 $('#room-name').append(room);
+
+pwd = prompt("What is the password?") || '';
 
 
 /*
@@ -47,8 +54,9 @@ socket.on('clientid', function(data) {
     console.log("I am client " + data.id);
 
     myId = data.id;
-    data.name = name.trim() || "Anonymous";
+    data.name = name || "Anonymous";
     data.room = room;
+    data.pwd = pwd;
 
     idNameMap[myId] = 'Me';
 
@@ -166,9 +174,11 @@ function decodeClientMessage(id, val) {
 }
 
 function displayNotification(from, data, color) {
-    var newdiv = $("<div><div><strong>" + from + ": </strong></div>" + data + "</div>");
+    if(data.trim() == '') return;
+    var newdiv = $("<div><div><strong>" + from + ": </strong></div>" + data.split('\n').join('<br>') + "</div>");
     if(color) newdiv.css("color", color);
     $("#chatdisplay").append(newdiv);
+    $("#chatdisplay").scrollTop($("#chatdisplay")[0].scrollHeight);
 }
 
 function readFileMetaData(id, metadata) {
