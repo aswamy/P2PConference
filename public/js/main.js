@@ -26,24 +26,6 @@ var DOWNLOAD = "Download";
 
 /*
  -----------------------------
- Prompts for data (temp only)
- -----------------------------
- */
-
-name = prompt("What's your name?") || '';
-name = name.trim();
-
-room = prompt("What room do you want to join?") || '';
-room = room.trim();
-if(room == '') room = "default_room";
-
-$('#room-name').append(room);
-
-pwd = prompt("What is the password?") || '';
-
-
-/*
- -----------------------------
  Messages via signaling server
  -----------------------------
  */
@@ -54,15 +36,24 @@ socket.on('clientid', function(data) {
     console.log("I am client " + data.id);
 
     myId = data.id;
-    data.name = name || "Anonymous";
-    data.room = room;
-    data.pwd = pwd;
 
     idNameMap[myId] = 'Me';
+});
 
+socket.on('successfullogin', function(data) {
+    // close login after first request
+    $('#room-name span').text(room);
+    displayLoginError("");
+    $('#loginModal').modal('hide');
     start();
+});
 
-    socket.emit('join', data);
+socket.on('failcaster', function(data) {
+    displayLoginError("Password for the room is incorrect");
+});
+
+socket.on('failwatcher', function(data) {
+    displayLoginError("Room does not already exist");
 });
 
 socket.on('newcaster', function(data) {
@@ -262,6 +253,9 @@ function createPeerConnection(id) {
     return pc;
 }
 
+function displayLoginError(message) {
+    $('#login-message em').text(message);
+}
 
 /*
  -----------------------------
@@ -321,3 +315,20 @@ document.getElementById("attachfile").onchange = function() {
         document.getElementById("attachfile").disabled = false;
     }
 };
+
+$('#loginModal').modal('show');
+
+$('#join-room-btn').click(function() {
+    var data = {};
+
+    name = $('#peer-input')[0].value.trim();
+    room = $('#room-input')[0].value.trim();
+    pwd = $('#password-input')[0].value.trim();
+
+    data.id = myId;
+    data.name = name || "Anonymous";
+    data.room = room;
+    data.pwd = pwd;
+
+    socket.emit('join', data);
+});

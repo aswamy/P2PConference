@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="column leftcolumn">
-        <div id="room-name"><span>Room: </span></div>
+        <div id="room-name">Room: <span></span></div>
         <div id='main-broadcaster'>
             <video id="mainvideo" autoplay></video>
         </div>
@@ -29,6 +29,30 @@
                 <button id="sendbtn">Send</button>
                 <button id="attachbtn" onclick="attach()">Attach</button>
                 <input style="display: none" id="attachfile" type="file">
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">P2P Conference</h4>
+                </div>
+                <div class="modal-body">
+                    <label for="peer-input" class="control-label">Name:</label>
+                    <input type="text" class="form-control" id="peer-input">
+
+                    <label for="room-input" class="control-label">Room:</label>
+                    <input type="text" class="form-control" id="room-input">
+
+                    <label for="password-input" class="control-label">Password:</label>
+                    <input type="password" class="form-control" id="password-input">
+
+                    <div id="login-message"><em></em></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="join-room-btn" type="button" class="btn btn-warning">Join Room</button>
+                </div>
             </div>
         </div>
     </div>

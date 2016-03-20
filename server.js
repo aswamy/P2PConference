@@ -39,6 +39,7 @@ io.on('connection', function (socket) {
 				roomMap.addRoomWatcher(message.room, message.id, message.name);
 				io.to(message.room).emit('newwatcher', message);
 				socket.join(message.room);
+				socket.emit('successfullogin', message);
 				console.log(roomMap.rooms);
 				return;
 			}
@@ -47,6 +48,7 @@ io.on('connection', function (socket) {
 				console.log("Adding caster");
 				roomMap.addRoomCaster(message.room, message.id, message.name);
 				io.to(message.room).emit('newcaster', message);
+				socket.emit('successfullogin', message);
 			} else {
 				console.log("Failed to add caster");
 				socket.emit('failcaster', message);
@@ -61,6 +63,7 @@ io.on('connection', function (socket) {
 				console.log("Adding caster");
 				roomMap.addRoom(message.room, message.pwd);
 				roomMap.addRoomCaster(message.room, message.id, message.name);
+				socket.emit('successfullogin', message);
 			} else {
 				console.log("Failed to add watcher");
 				socket.emit('failwatcher', message);
