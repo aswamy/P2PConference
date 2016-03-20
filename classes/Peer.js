@@ -1,6 +1,5 @@
-function Peer(id, name, socket) {
+function Peer(id, name) {
     this.id = id;
-    this.socket = socket;
     this.name = name;
 }
 
@@ -19,32 +18,34 @@ function RoomMap() {
         this.rooms[id] = new Room(id, pwd);
     };
 
+    this.roomExists = function(id) {
+        return this.rooms[id] == undefined ? false : true;
+    };
+
     this.removeRoom = function(id) {
         delete this.rooms[id];
     };
 
-    this.addRoomCaster = function(roomId, casterId, name, socket) {
-        return this.addRoomPeer(roomId, casterId, true, name, socket);
+    this.addRoomCaster = function(roomId, casterId, name) {
+        return this.addRoomPeer(roomId, casterId, true, name);
     };
 
     this.removeRoomCaster = function(roomId, casterId) {
-        var casterCount = this.removeRoomPeer(roomId, casterId, true);
-        if(casterCount == 0) this.removeRoom(roomId);
-        return casterCount;
+        return this.removeRoomPeer(roomId, casterId, true);
     };
 
-    this.addRoomWatcher = function(roomId, watcherId, name, socket) {
-        return this.addRoomPeer(roomId, watcherId, false, name, socket);
+    this.addRoomWatcher = function(roomId, watcherId, name) {
+        return this.addRoomPeer(roomId, watcherId, false, name);
     };
 
     this.removeRoomWatcher = function(roomId, watcherId) {
         return this.removeRoomPeer(roomId, watcherId, false);
     };
 
-    this.addRoomPeer = function(roomId, peerId, isCaster, name, socket) {
+    this.addRoomPeer = function(roomId, peerId, isCaster, name) {
         var peerRole = this.getPeerRole(isCaster);
 
-        this.rooms[roomId][peerRole][peerId] = new Peer(peerId, name, socket);
+        this.rooms[roomId][peerRole][peerId] = new Peer(peerId, name);
         return Object.keys(this.rooms[roomId][peerRole]).length;
     };
 

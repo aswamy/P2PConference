@@ -65,7 +65,7 @@ socket.on('clientid', function(data) {
     socket.emit('join', data);
 });
 
-socket.on('newguy', function(data) {
+socket.on('newcaster', function(data) {
     var id = data.id;
 
     console.info("New guy:", id);
@@ -85,6 +85,28 @@ socket.on('newguy', function(data) {
         }, null);
     }, null);
 });
+
+socket.on('newwatcher', function(data) {
+    var id = data.id;
+
+    console.info("New guy:", id);
+
+    var pc = createPeerConnection(id);
+    idNameMap[id] = data.name;
+
+    datachannels[id] = pc.createDataChannel('sendDataChannel', null);
+    setupDatachannel(datachannels[id], id);
+
+    pc.ondatachannel = onDataChannelHandler(id);
+
+    pc.createOffer(function(offer) {
+        pc.setLocalDescription(new RTCSessionDescription(offer), function() {
+            console.log('Sending client ' + id + ' a call offer');
+            socket.emit('peerconnsetuprequest', {id: id, name: name, data: offer});
+        }, null);
+    }, null);
+});
+
 
 socket.on('peerconnsetuprequest', function(data) {
     var id = data.id;

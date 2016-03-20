@@ -22,15 +22,53 @@ var proxy = require('http').createServer(function (req, res) {
 
 var io = require('socket.io')(app);
 
-var openRooms = {};
-
+var RoomMap = require('./classes/Peer.js');
+var roomMap = new RoomMap();
 
 io.on('connection', function (socket) {
 
 	socket.on('join', function(message) {
 		// Tell everyone in the room "hello!"
 		socket.peer_name = message.name;
-		io.to(message.room).emit('newguy', message);
+		socket.room_name = message.room;
+		if (roomMap.roomExists(message.room)) {
+			console.log("Room " + message.room + " exists");
+
+			if (message.pwd.length == 0) {
+				console.log("Adding watcher");
+				roomMap.addRoomWatcher(message.room, message.id, message.name);
+				io.to(message.room).emit('newwatcher', message);
+				socket.join(message.room);
+				console.log(roomMap.rooms);
+				return;
+			}
+
+			if (message.pwd == roomMap.rooms[message.room].pwd) {
+				console.log("Adding caster");
+				roomMap.addRoomCaster(message.room, message.id, message.name);
+				io.to(message.room).emit('newcaster', message);
+			} else {
+				console.log("Failed to add caster");
+				socket.emit('failcaster', message);
+				console.log(roomMap.rooms);
+				return;
+			}
+
+		} else {
+			console.log("Room " + message.room + " does not exist");
+
+			if(message.pwd.length > 0) {
+				console.log("Adding caster");
+				roomMap.addRoom(message.room, message.pwd);
+				roomMap.addRoomCaster(message.room, message.id, message.name);
+			} else {
+				console.log("Failed to add watcher");
+				socket.emit('failwatcher', message);
+				console.log(roomMap.rooms);
+				return;
+			}
+		}
+		console.log(roomMap.rooms);
 		socket.join(message.room);
 	});
 
@@ -63,6 +101,21 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function() {
 		console.log("Client: " + " - " + socket.peer_name + " has disconnected");
+
+		if (roomMap.rooms[socket.room_name] != undefined) {
+			if (roomMap.removeRoomCaster(socket.room_name, socket.id) == 0) {
+				var watchers = roomMap.rooms[socket.room_name].watchers;
+				Object.keys(watchers).forEach(function(w) {
+					io.sockets.connected[watchers[w].id].leave(socket.room_name);
+				});
+				roomMap.removeRoom(socket.room_name);
+			}
+
+			if(roomMap.rooms[socket.room_name])
+				roomMap.removeRoomWatcher(socket.room_name, socket.id);
+		}
+
+		console.log(roomMap.rooms);
 	});
 
 	socket.emit('clientid', { id: socket.id });
