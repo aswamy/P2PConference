@@ -335,7 +335,10 @@ $('#join-room-btn').click(function() {
     data.room = room;
     data.pwd = pwd;
 
-    if($("#caster-tab.active").length < 0) data.pwd = '';
+    if($("#caster-tab.active").length == 0) {
+        console.log("signing in as viewer");
+        data.pwd = '';
+    }
 
     socket.emit('join', data);
 });
