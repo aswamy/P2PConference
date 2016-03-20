@@ -39,14 +39,25 @@
                     <h4 class="modal-title" id="myModalLabel">P2P Conference</h4>
                 </div>
                 <div class="modal-body">
-                    <label for="peer-input" class="control-label">Name:</label>
-                    <input type="text" class="form-control" id="peer-input">
+                        <ul class="nav nav-tabs nav-justified">
+                            <li id="view-tab" class="active"><a href="#viewer" data-toggle="tab">Viewer</a></li>
+                            <li id="caster-tab"><a href="#caster" data-toggle="tab">Caster</a></li>
+                        </ul>
 
-                    <label for="room-input" class="control-label">Room:</label>
-                    <input type="text" class="form-control" id="room-input">
+                        <label for="peer-input" class="control-label">Name:</label>
+                        <input type="text" class="form-control" id="peer-input">
 
-                    <label for="password-input" class="control-label">Password:</label>
-                    <input type="password" class="form-control" id="password-input">
+                        <label for="room-input" class="control-label">Room:</label>
+                        <input type="text" class="form-control" id="room-input">
+
+                        <div class="tab-content ">
+                            <div class="tab-pane active" id="viewer">
+                            </div>
+                            <div class="tab-pane" id="caster">
+                                <label for="password-input" class="control-label">Password:</label>
+                                <input type="password" class="form-control" id="password-input">
+                            </div>
+                        </div>
 
                     <div id="login-message"><em></em></div>
                 </div>

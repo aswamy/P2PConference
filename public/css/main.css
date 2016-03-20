@@ -106,9 +106,14 @@ body {
 
 /** modal **/
 
-.modal-body input {
-    margin-bottom: 5px;
+.modal-body label {
+    margin: 5px 0px;
 }
+
+.modal-header {
+    text-align: center;
+}
+
 #login-message {
     color: red;
     text-align: center;

@@ -325,10 +325,17 @@ $('#join-room-btn').click(function() {
     room = $('#room-input')[0].value.trim();
     pwd = $('#password-input')[0].value.trim();
 
+    if(room == '') {
+        displayLoginError("Please enter a room name");
+        return;
+    }
+
     data.id = myId;
     data.name = name || "Anonymous";
     data.room = room;
     data.pwd = pwd;
+
+    if($("#caster-tab.active").length < 0) data.pwd = '';
 
     socket.emit('join', data);
 });
