@@ -39,7 +39,7 @@ io.on('connection', function (socket) {
 				roomMap.addRoomWatcher(message.room, message.id, message.name);
 				io.to(message.room).emit('newwatcher', message);
 				socket.join(message.room);
-				socket.emit('successfullogin', message);
+				socket.emit('successfullogin', 'viewer');
 				console.log(roomMap.rooms);
 				return;
 			}
@@ -48,7 +48,7 @@ io.on('connection', function (socket) {
 				console.log("Adding caster");
 				roomMap.addRoomCaster(message.room, message.id, message.name);
 				io.to(message.room).emit('newcaster', message);
-				socket.emit('successfullogin', message);
+				socket.emit('successfullogin', 'caster');
 			} else {
 				console.log("Failed to add caster");
 				socket.emit('failcaster', message);
@@ -63,7 +63,7 @@ io.on('connection', function (socket) {
 				console.log("Adding caster");
 				roomMap.addRoom(message.room, message.pwd);
 				roomMap.addRoomCaster(message.room, message.id, message.name);
-				socket.emit('successfullogin', message);
+				socket.emit('successfullogin', 'caster');
 			} else {
 				console.log("Failed to add watcher");
 				socket.emit('failwatcher', message);
@@ -78,10 +78,12 @@ io.on('connection', function (socket) {
 	socket.on('peerconnsetuprequest', function(message) {
 		console.log("Got a setup request from " + socket.id + " to " + message.id);
 
-		io.sockets.connected[message.id]
-			.emit('peerconnsetuprequest',
-				{ id: socket.id, data: message.data, name: message.name }
-			);
+		var to = message.id;
+
+		message.id = socket.id;
+
+		io.sockets.connected[to]
+			.emit('peerconnsetuprequest', message);
 	});
 
 	socket.on('peerconnsetupanswer', function(message) {

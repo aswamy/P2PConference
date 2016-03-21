@@ -5,7 +5,11 @@ var peerconnections = {};
 var datachannels = {};
 
 var idNameMap = {};
+var isPeerCaster = {};
+
 var myId = '';
+var myRole = '';
+
 var name = '';
 var room = '';
 var pwd = '';
@@ -43,9 +47,11 @@ socket.on('clientid', function(data) {
 socket.on('successfullogin', function(data) {
     // close login after first request
     $('#room-name span').text(room);
+
     displayLoginError("");
+    myRole = data;
     $('#loginModal').modal('hide');
-    start();
+    if(myRole == 'caster') start();
 });
 
 socket.on('failcaster', function(data) {
@@ -59,7 +65,7 @@ socket.on('failwatcher', function(data) {
 socket.on('newcaster', function(data) {
     var id = data.id;
 
-    console.info("New guy:", id);
+    console.info("New caster:", id);
 
     var pc = createPeerConnection(id);
     idNameMap[id] = data.name;
@@ -72,7 +78,7 @@ socket.on('newcaster', function(data) {
     pc.createOffer(function(offer) {
         pc.setLocalDescription(new RTCSessionDescription(offer), function() {
             console.log('Sending client ' + id + ' a call offer');
-            socket.emit('peerconnsetuprequest', {id: id, name: name, data: offer});
+            socket.emit('peerconnsetuprequest', {id: id, name: name, role: myRole, data: offer});
         }, null);
     }, null);
 });
@@ -80,7 +86,7 @@ socket.on('newcaster', function(data) {
 socket.on('newwatcher', function(data) {
     var id = data.id;
 
-    console.info("New guy:", id);
+    console.info("New watcher:", id);
 
     var pc = createPeerConnection(id);
     idNameMap[id] = data.name;
@@ -93,11 +99,10 @@ socket.on('newwatcher', function(data) {
     pc.createOffer(function(offer) {
         pc.setLocalDescription(new RTCSessionDescription(offer), function() {
             console.log('Sending client ' + id + ' a call offer');
-            socket.emit('peerconnsetuprequest', {id: id, name: name, data: offer});
+            socket.emit('peerconnsetuprequest', {id: id, name: name, role: myRole, data: offer});
         }, null);
     }, null);
 });
-
 
 socket.on('peerconnsetuprequest', function(data) {
     var id = data.id;
@@ -138,6 +143,8 @@ socket.on('icecandidate', function(data) {
 
 function onAddStreamHandler(id) {
     return function(event) {
+        console.log("========= stream has been added ==========");
+
         var newVid = $("<video id='" +id+ "' class='broadcaster'></video>");
         $("#casters").append( newVid );
         document.getElementById(id).srcObject = event.stream;
@@ -224,14 +231,15 @@ function gotStream(stream) {
 }
 
 function start() {
-    navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: true
-        })
-        .then(gotStream)
-        .catch(function(e) {
-            console.log('getUserMedia() error: ', e);
-        });
+    if(myRole == 'caster')
+        navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: true
+            })
+            .then(gotStream)
+            .catch(function(e) {
+                console.log('getUserMedia() error: ', e);
+            });
 }
 
 function connEstablished() {
@@ -242,7 +250,7 @@ function createPeerConnection(id) {
     var pc = new RTCPeerConnection();
     peerconnections[id] = pc;
 
-    pc.addStream(localstream);
+    if(myRole == 'caster') pc.addStream(localstream);
     pc.onicecandidate = onAddIceCandidateHandler(id);
     pc.onaddstream = onAddStreamHandler(id);
     pc.oniceconnectionstatechange = function() {
