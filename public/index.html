@@ -20,14 +20,17 @@
         </div>
     </div>
     <div class="column rightcolumn">
+        <div id="chatpeers">
+            <button class="btn btn-warning">Peer List</button>
+        </div>
         <div id="chatdisplay">
         </div>
         <div id="chatinput">
             <div><textarea></textarea>
             </div>
             <div>
-                <button id="sendbtn">Send</button>
-                <button id="attachbtn" onclick="attach()">Attach</button>
+                <button class="btn btn-success" id="sendbtn">Send</button>
+                <button class="btn btn-danger" id="attachbtn" onclick="attach()">Attach</button>
                 <input style="display: none" id="attachfile" type="file">
             </div>
         </div>
@@ -63,6 +66,19 @@
                 </div>
                 <div class="modal-footer">
                     <button id="join-room-btn" type="button" class="btn btn-warning">Join Room</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="peerlistModal" tabindex="-1" role="dialog" aria-labelledby="peerModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="peerModalLabel">Peer List</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="peerListCasters"><h3>Casters</h3><div class="peerListContent"></div></div>
+                    <div id="peerListViewers"><h3>Viewers</h3><div class="peerListContent"></div></div>
                 </div>
             </div>
         </div>

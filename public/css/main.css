@@ -49,6 +49,14 @@ body {
     height: 13%;
     margin: 1%;
 }
+#chatpeers {
+    background-color: dimgray;
+    text-align: center;
+    height: 50px
+}
+#chatpeers > button {
+    margin-top: 8px;
+}
 #chatdisplay {
     background-color: rgb(225,225,225);
     border-style: solid;
@@ -56,7 +64,7 @@ body {
     border-width: 0px;
     border-left-width: 1px;
     width: 100%;
-    height: calc(100% - 150px);
+    height: calc(100% - 200px);
     overflow-y: scroll;
     font-size: 14px;
     word-wrap: break-word;
@@ -96,13 +104,6 @@ body {
     -ms-user-select: none;
     user-select: none;
 }
-#sendbtn {
-    background-color: forestgreen;
-}
-#attachbtn {
-    background-color: darkorange;
-}
-
 
 /** modal **/
 

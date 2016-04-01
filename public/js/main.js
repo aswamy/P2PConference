@@ -69,6 +69,7 @@ socket.on('newcaster', function(data) {
 
     var pc = createPeerConnection(id);
     idNameMap[id] = data.name;
+    isPeerCaster[id] = true;
 
     datachannels[id] = pc.createDataChannel('sendDataChannel', null);
     setupDatachannel(datachannels[id], id);
@@ -90,6 +91,7 @@ socket.on('newwatcher', function(data) {
 
     var pc = createPeerConnection(id);
     idNameMap[id] = data.name;
+    isPeerCaster[id] = false;
 
     datachannels[id] = pc.createDataChannel('sendDataChannel', null);
     setupDatachannel(datachannels[id], id);
@@ -110,6 +112,7 @@ socket.on('peerconnsetuprequest', function(data) {
 
     var pc = createPeerConnection(id);
     idNameMap[id] = data.name;
+    isPeerCaster[id] = data.role == 'caster';
 
     pc.ondatachannel = onDataChannelHandler(id);
 
@@ -349,4 +352,40 @@ $('#join-room-btn').click(function() {
     }
 
     socket.emit('join', data);
+});
+
+$('#chatpeers button').click(function() {
+
+    $("#peerListCasters .peerListContent").html('');
+    $("#peerListViewers .peerListContent").html('');
+
+    var createPeerHtml = function (name, isEmphasized) {
+        var htmlOutput = "<div>";
+        if(isEmphasized) {
+            htmlOutput += "<em>"+name+"</em>";
+        } else {
+            htmlOutput += name;
+        }
+        htmlOutput += "</div>";
+        return htmlOutput;
+    };
+
+    var casters = [];
+    var viewers = [];
+
+    if(myRole == 'caster') casters.push(name + " (Me)");
+    else viewers.push(name + " (Me)");
+
+    $.each(datachannels, function (channelId, channel) {
+        if(isPeerCaster[channelId]) casters.push(idNameMap[channelId]);
+        else viewers.push(idNameMap[channelId]);
+    });
+
+    if (casters.length == 0) $("#peerListCasters .peerListContent").append(createPeerHtml("None", true));
+    if (viewers.length == 0) $("#peerListViewers .peerListContent").append(createPeerHtml("None", true));
+
+    $.each(casters, function(index, c) { $("#peerListCasters .peerListContent").append(createPeerHtml(c, false)) });
+    $.each(viewers, function(index, v) { $("#peerListViewers .peerListContent").append(createPeerHtml(v, false)) });
+
+    $('#peerlistModal').modal('show');
 });
