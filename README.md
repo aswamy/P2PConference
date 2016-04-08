@@ -1,6 +1,9 @@
 # P2PConference
 
-Installation:<br />
-1) npm install<br />
-2) cd code<br />
-3) node server.js<br />
+Requirements:<br />
+1) Node.JS
+
+Run the application:<br />
+1) Run <em>npm install</em><br />
+2) Run <em>node server.js</em><br />
+3) open https://localhost in Chrome <br />
