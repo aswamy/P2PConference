@@ -1,11 +1,13 @@
+## P2PConference ##
+
 Hello dear reader,
 
-This is an application I developed for my 4th year project for Carleton University. 
+This is an application I developed for my 4th year Software Engineering Project while I was studying at Carleton University, Canada. 
 
 
 ## What Does This App Do? ##
 
-It was a web-based peer-to-peer multi-person conferencing application built using WebRTC. It was supposed to have the ability to conduct a multi-person conference (like Skype), while also have the ability to have multiple viewers watching the conversation at real-time (like on Twitch).
+It was a web-based, peer-to-peer, multi-person conferencing application built using WebRTC. It was supposed to have the ability to conduct a multi-person conference (like Skype), while also have the ability to have multiple viewers watching the conversation at real-time (like on Twitch).
 
 
 ## Rules Of The Game ##
@@ -35,7 +37,7 @@ __I am new to WebRTC and I am curious about how it works. Can we chat?__
 Sure thing. I promise not to bite.
 
 
-## Installation ##
+## Installation + Running it ##
 
 1. Get Node.JS
 2. Get my repo
