@@ -4,7 +4,8 @@ Hello dear reader,
 
 This is an application I developed for my 4th year Software Engineering Project while I was studying at Carleton University, Canada. 
 
-
+P2P OF Python new install chmod +x P2P.py 
+python P2P.py
 ## What Does This App Do? ##
 
 It was a web-based, peer-to-peer, multi-person conferencing application built using WebRTC. It was supposed to have the ability to conduct a multi-person conference (like Skype), while also have the ability to have multiple viewers watching the conversation at real-time (like on Twitch).
@@ -39,10 +40,8 @@ Sure thing. I promise not to bite.
 
 ## Installation + Running it ##
 
-1. Get Node.JS
-2. Get my repo
-3. Navigate to my repo
-4. run "npm install"
-5. run "node server.js"
-6. Open your browser to "https://localhost"
-7. Done.
+1. chmod +x P2P.py
+2. python P2P.py
+3. run "npm install"
+4. Open your browser to "https://localhost"
+5. Done.
